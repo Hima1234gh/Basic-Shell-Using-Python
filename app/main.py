@@ -3,7 +3,7 @@ import sys
 BULITINS = {
     "exit" : lambda code=0, *_ : sys.exit(int(code)),
     "echo" : lambda *args : print(" ".join(args)),
-    "type" : lambda cmd=None, *_: print(f"{cmd} is a built-in command") if cmd in BULITINS else print(f"{cmd} not found")
+    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(f"{cmd} not found")
 }
 
 def main():
