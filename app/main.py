@@ -4,7 +4,11 @@ import sys
 def main():
     sys.stdout.write("$ ")
     command = input()
-    print(f"{command}: command not found")
+    while command != " ":
+        sys.stdout.write(f"Executing command: {command}\n")
+        sys.stdout.write("$ ")
+        command = input()
+
 
 
 if __name__ == "__main__":
