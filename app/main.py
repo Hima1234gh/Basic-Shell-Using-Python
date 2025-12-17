@@ -2,7 +2,6 @@ import sys
 
 
 def main():
-    sys.stdout.write("$ ")
     while True:
             try:
                 sys.stdout.write("$ ")
@@ -21,7 +20,7 @@ def main():
             if commands[0] == "echo":
                 print(" ".join(commands[1:]))
             else:
-                print(f"{commands[0]}: command not found")
+                sys.stdout.write(f"{commands[0]}: command not found\n")
         
 
 if __name__ == "__main__":
