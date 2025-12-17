@@ -2,7 +2,7 @@ import sys
 
 
 def main():
-    system_command = ["echo", "exit"]
+    system_command = ["echo", "exit", "type"]
     while True:
             try:
                 sys.stdout.write("$ ")
@@ -19,7 +19,7 @@ def main():
 
             commands = command.split()
             if commands[0] in system_command:
-                if commands[1:] == "\n":
+                if commands[0] == "\n":
                     sys.stdout.write(f"{commands[0]} is a shell bultin\n")
                 elif commands[0] == "echo":
                     sys.stdout.write(" ".join(commands[1:]) + "\n")
