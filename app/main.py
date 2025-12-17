@@ -24,7 +24,10 @@ def main():
             elif commands[0] == "type" and commands[1] in comm:
                 sys.stdout.write(f"{commands[1]} is a shell builtin\n")
             else:
-                sys.stdout.write(f"{commands[0]}: command not found\n")
+                if commands[1] not in comm:
+                    sys.stderr.write(f"{commands[1]} : not found\n")
+                else :
+                    sys.stderr.write(f"{commands[1]}: command not found\n")
         
 
 if __name__ == "__main__":
