@@ -2,7 +2,6 @@ import sys
 
 
 def main():
-    system_command = ["echo", "exit", "type"]
     while True:
             try:
                 sys.stdout.write("$ ")
@@ -18,11 +17,11 @@ def main():
                 continue
 
             commands = command.split()
-            if commands[0] in system_command:
-                if commands[0] == "\n":
-                    sys.stdout.write(f"{commands[0]} is a shell bultin\n")
-                elif commands[0] == "echo":
-                    sys.stdout.write(" ".join(commands[1:]) + "\n")
+            
+            if commands[0] == "echo":
+                sys.stdout.write(" ".join(commands[1:]) + "\n")
+            elif commands[0] == "type" :
+                sys.stdout.write(f"{commands[1]} is a shell builtin\n")
             else:
                 sys.stdout.write(f"{commands[0]}: command not found\n")
         
