@@ -25,7 +25,7 @@ def main():
                 sys.stdout.write(f"{commands[1]} is a shell builtin\n")
             else:
                 if commands[1] not in comm:
-                    sys.stderr.write(f"{commands[1]} : not found\n")
+                    sys.stderr.write(f"{commands[1]}: not found\n")
                 else :
                     sys.stderr.write(f"{commands[1]}: command not found\n")
         
