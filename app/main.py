@@ -1,33 +1,27 @@
 import sys
 
+BULITINS = {
+    "exit" : lambda code=0, *_ : sys.exit(int(code)),
+    "echo" : lambda *args : print(" ".join(args)),
+    "type" : lambda cmd=None, *_: print(f"{cmd} is a built-in command") if cmd in BULITINS else print(f"{cmd} not found")
+}
 
 def main():
-    while True:
-            comm = ["type", "echo", "exit"]
-            try:
-                sys.stdout.write("$ ")
-                sys.stdout.flush()
-                command = input()
-            except EOFError:
-                break
+    while True :
+        sys.stdout.write("$ ")
+        sys.stdout.flush()
 
-            if command.strip() == "exit":
-                break
+        user_input = input().split()
 
-            if not command.strip():
-                continue
+        if not user_input: 
+            continue
 
-            commands = command.split()
-            
-            if commands[0] == "echo":
-                sys.stdout.write(" ".join(commands[1:]) + "\n")
-            elif commands[0] == "type" and commands[1] in comm:
-                sys.stdout.write(f"{commands[1]} is a shell builtin\n")
-            else:
-                if commands[1] not in comm:
-                    sys.stderr.write(f"{commands[1]}: not found\n")
-                else :
-                    sys.stderr.write(f"{commands[1]}: command not found\n")
+        cmd, *args = user_input
+
+        if cmd in BULITINS :
+            BULITINS[cmd](*args)
+        else :
+            print(f"{cmd}: command not found")
         
 
 if __name__ == "__main__":
