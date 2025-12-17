@@ -10,13 +10,11 @@ def main():
     while True :
         sys.stdout.write("$ ")
         sys.stdout.flush()
-
         user_input = input().split()
 
         if not user_input: 
             continue
-
-        cmd, *args = user_input
+        cmd,*args = user_input
 
         if cmd in BULITINS :
             BULITINS[cmd](*args)
