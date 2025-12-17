@@ -1,15 +1,16 @@
 import sys
+import shutil
 
 def path_found(cmd) -> str:
     if path := shutil.which(cmd):
         return f"{cmd} is {path}" 
     else :
-        return f{cmd}: 
+        return f"{cmd}: not found"
 
 BULITINS = {
     "exit" : lambda code=0, *_ : sys.exit(int(code)),
     "echo" : lambda *args : print(" ".join(args)),
-    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else 
+    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd))
 }
 
 def main():
