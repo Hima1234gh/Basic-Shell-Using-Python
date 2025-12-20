@@ -1,30 +1,34 @@
 import sys
 import shutil
 
+#Finds the path in the given command
 def path_found(cmd) -> str:
     if path := shutil.which(cmd):
         return f"{cmd} is {path}" 
     else :
         return f"{cmd}: not found"
 
+#List of Built-in commands 
 BULITINS = {
-    "exit" : lambda code=0, *_ : sys.exit(int(code)),
-    "echo" : lambda *args : print(" ".join(args)),
-    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd))
+    "exit" : lambda code=0, *_ : sys.exit(int(code)), #Exits the shell with the given code
+    "echo" : lambda *args : print(" ".join(args)), #Prints the arguments to the console
+    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd)) #Finds if the command is a built-in or external command
 }
 
+
+#Main function to run the shell
 def main():
-    while True :
+    while True : #Infinite loop to keep the shell running
         sys.stdout.write("$ ")
         sys.stdout.flush()
         user_input = input().split()
 
-        if not user_input: 
+        if not user_input: #If no input is given, continue to the next iteration
             continue
         cmd,*args = user_input
 
         if cmd in BULITINS :
-            BULITINS[cmd](*args)
+            BULITINS[cmd](*args) #Execute the built-in command
         else :
             print(f"{cmd}: command not found")
         
