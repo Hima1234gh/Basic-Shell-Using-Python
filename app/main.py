@@ -5,7 +5,7 @@ import subprocess
 import shlex
 import re 
 
-
+# Utility function to locate a command in the system PATH
 # Finds the path in the given command
 def path_found(cmd) -> str:
     if path := shutil.which(cmd):
@@ -54,7 +54,7 @@ def main():
             if not user_input:
                 continue
 
-            # ---------- INPUT REDIRECTION ----------
+            
             if "<" in tokens:
                 idx = tokens.index("<")
 
@@ -75,7 +75,7 @@ def main():
 
                 del tokens[idx:idx + 2]
 
-            # ---------- OUTPUT / ERROR REDIRECTION ----------
+            
             i = 0
             while i < len(tokens):
                 tok = tokens[i]
@@ -109,12 +109,12 @@ def main():
 
                 i += 1
 
-            # ---------- VARIABLE EXPANSION ----------
+            
             expanded = [expand_vars(arg) for arg in tokens]
 
             cmd, *args = expanded
 
-            # ---------- EXECUTION ----------
+            
             if cmd in BULITINS:
                 # Builtins also respect redirection
                 saved_stdin = sys.stdin
@@ -161,7 +161,7 @@ def main():
                 except FileNotFoundError:
                     print(f"{cmd}: command not found")
 
-            # ---------- CLEANUP ----------
+            
             if stdin:
                 stdin.close()
             if stdout:
