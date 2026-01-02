@@ -47,22 +47,28 @@ def main():
                 print(f"Error parsing input: {ve}")
                 continue
 
-            if ">" in tokens:
-                idx = tokens.index(">")
+            if "<" in tokens:
+                    idx = tokens.index("<")
 
-                if len(tokens) - 1 == idx :
-                    print("Syntax error: no output file specified")
-                    continue    
+                    # Syntax validation
+                    if idx == len(tokens) - 1:
+                        print("syntax error: expected filename after '<'")
+                        continue
 
-                infile = tokens[idx + 1]
+                    infile = tokens[idx + 1]
 
-                try :
-                    stdin = open(infile, "r") #Open the file for reading
-                except FileNotFoundError:
-                    print(f"{infile}: No such file or directory")
-                    continue
-                
-                tokens = tokens[:idx] #Remove the redirection part from the tokens
+                    try:
+                        stdin = open(infile, "r")
+                    except FileNotFoundError:
+                        print(f"{infile}: No such file or directory")
+                        continue
+                    except PermissionError:
+                        print(f"{infile}: Permission denied")
+                        continue
+
+                    # Remove '< file'
+                    del tokens[idx:idx + 2]
+
 
 
             if not user_input: #If no input is given, continue to the next iteration
