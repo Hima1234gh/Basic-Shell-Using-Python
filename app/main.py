@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import shlex
 import re 
+
 #Finds the path in the given command
 def path_found(cmd) -> str:
     if path := shutil.which(cmd):
@@ -56,7 +57,18 @@ def main():
                 BULITINS[cmd](*args) #Execute the built-in command
             else :
                 try:
-                    subprocess.run([cmd] + args)
+                    # If command contains '/', execute directly (quoted paths work here)
+                    if "/" in cmd:
+                        if not os.path.exists(cmd):
+                            print(f"{cmd}: No such file or directory")
+                        elif not os.access(cmd, os.X_OK):
+                            print(f"{cmd}: Permission denied")
+                        else:
+                            subprocess.run([cmd] + args)
+                    else:
+                        # No slash → search PATH
+                        subprocess.run([cmd] + args)
+
                 except FileNotFoundError:
                     print(f"{cmd}: command not found")
         except EOFError:
