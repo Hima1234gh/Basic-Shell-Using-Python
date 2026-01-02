@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import subprocess
+import shlex
 
 #Finds the path in the given command
 def path_found(cmd) -> str:
@@ -22,22 +23,33 @@ BULITINS = {
 
 #Main function to run the shell
 def main():
-    while True : #Infinite loop to keep the shell running
-        sys.stdout.write("$ ")
-        sys.stdout.flush()
-        user_input = input().split()
+    while True : 
+        try : #Infinite loop to keep the shell running
+            sys.stdout.write("$ ")
+            sys.stdout.flush()
+            user_input = input()
+            try :
+                tokens = shlex.split(user_input, posix=True) #Parse the input using shlex
+                user_input = tokens
+            except ValueError as ve:
+                print(f"Error parsing input: {ve}")
+                continue
 
-        if not user_input: #If no input is given, continue to the next iteration
-            continue
-        cmd,*args = user_input
 
-        if cmd in BULITINS :
-            BULITINS[cmd](*args) #Execute the built-in command
-        else :
-            try:
-                subprocess.run([cmd] + args)
-            except FileNotFoundError:
-                print(f"{cmd}: command not found")
+            if not user_input: #If no input is given, continue to the next iteration
+                continue
+            cmd,*args = user_input
+
+            if cmd in BULITINS :
+                BULITINS[cmd](*args) #Execute the built-in command
+            else :
+                try:
+                    subprocess.run([cmd] + args)
+                except FileNotFoundError:
+                    print(f"{cmd}: command not found")
+        except EOFError:
+            print() #Print a new line on EOF
+            break
         
 
 if __name__ == "__main__":
