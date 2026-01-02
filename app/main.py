@@ -39,6 +39,7 @@ def main():
             sys.stdout.write("$ ")
             sys.stdout.flush()
             user_input = input()
+            stdin = None
             try :
                 tokens = shlex.split(user_input, posix=True) #Parse the input using shlex
                 
@@ -46,9 +47,27 @@ def main():
                 print(f"Error parsing input: {ve}")
                 continue
 
+            if ">" in tokens:
+                idx = tokens.index(">")
+
+                if len(tokens) - 1 == idx :
+                    print("Syntax error: no output file specified")
+                    continue    
+
+                infile = tokens[idx + 1]
+
+                try :
+                    stdin = open(infile, "r") #Open the file for reading
+                except FileNotFoundError:
+                    print(f"{infile}: No such file or directory")
+                    continue
+                
+                tokens = tokens[:idx] #Remove the redirection part from the tokens
+
 
             if not user_input: #If no input is given, continue to the next iteration
                 continue
+
             expanded = [expand_vars(arg) for arg in tokens]#Expand environment variables in the arguments
 
             cmd,*args = expanded #Split the command and arguments
@@ -71,6 +90,9 @@ def main():
 
                 except FileNotFoundError:
                     print(f"{cmd}: command not found")
+                finally :
+                    if stdin:
+                        stdin.close()
         except EOFError:
             print() #Print a new line on EOF
             break
