@@ -3,13 +3,21 @@ import sys
 import shutil
 import subprocess
 import shlex
-
+import re 
 #Finds the path in the given command
 def path_found(cmd) -> str:
     if path := shutil.which(cmd):
         return f"{cmd} is {path}" 
     else :
         return f"{cmd}: not found"
+
+def expand_vars(arg: str) -> str:
+        def replace_var(match):
+            var_name = match.group(1) or match.group(2)
+            return os.environ.get(var_name, "") 
+        pattern = r'\$(\w+)|\${(\w+)}'
+        return re.sub(pattern, replace_var, arg)
+
 
 #List of Built-in commands 
 BULITINS = {
@@ -21,6 +29,8 @@ BULITINS = {
 }
 
 
+
+
 #Main function to run the shell
 def main():
     while True : 
@@ -30,7 +40,7 @@ def main():
             user_input = input()
             try :
                 tokens = shlex.split(user_input, posix=True) #Parse the input using shlex
-                user_input = tokens
+                
             except ValueError as ve:
                 print(f"Error parsing input: {ve}")
                 continue
@@ -38,7 +48,9 @@ def main():
 
             if not user_input: #If no input is given, continue to the next iteration
                 continue
-            cmd,*args = user_input
+            expanded = [expand_vars(arg) for arg in tokens]#Expand environment variables in the arguments
+
+            cmd,*args = expanded #Split the command and arguments
 
             if cmd in BULITINS :
                 BULITINS[cmd](*args) #Execute the built-in command
