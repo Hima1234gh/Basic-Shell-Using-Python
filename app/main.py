@@ -1,5 +1,6 @@
 import sys
 import shutil
+import subprocess
 
 #Finds the path in the given command
 def path_found(cmd) -> str:
@@ -13,6 +14,7 @@ BULITINS = {
     "exit" : lambda code=0, *_ : sys.exit(int(code)), #Exits the shell with the given code
     "echo" : lambda *args : print(" ".join(args)), #Prints the arguments to the console
     "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd)) #Finds if the command is a built-in or external command
+
 }
 
 
@@ -30,7 +32,10 @@ def main():
         if cmd in BULITINS :
             BULITINS[cmd](*args) #Execute the built-in command
         else :
-            print(f"{cmd}: command not found")
+            try:
+                subprocess.run([cmd] + args)
+            except FileNotFoundError:
+                print(f"{cmd}: command not found")
         
 
 if __name__ == "__main__":
