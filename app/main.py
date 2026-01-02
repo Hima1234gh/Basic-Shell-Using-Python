@@ -1,3 +1,4 @@
+import os
 import sys
 import shutil
 import subprocess
@@ -15,6 +16,7 @@ BULITINS = {
     "echo" : lambda *args : print(" ".join(args)), #Prints the arguments to the console
     "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd)), #Finds if the command is a built-in or external command
     "pwd" : lambda : print(subprocess.getoutput("pwd")), #Prints the current working directory
+    "cd" : lambda path="~" : os.chdir(os.path.abspath(path)) if os.path.exists(os.path.abspath(path)) else print(f"cd: {path}: No such file or directory"), #Changes the current working directory
 }
 
 
