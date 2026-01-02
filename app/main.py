@@ -13,8 +13,8 @@ def path_found(cmd) -> str:
 BULITINS = {
     "exit" : lambda code=0, *_ : sys.exit(int(code)), #Exits the shell with the given code
     "echo" : lambda *args : print(" ".join(args)), #Prints the arguments to the console
-    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd)) #Finds if the command is a built-in or external command
-
+    "type" : lambda cmd=None, *_: print(f"{cmd} is a shell builtin") if cmd in BULITINS else print(path_found(cmd)), #Finds if the command is a built-in or external command
+    "pwd" : lambda : print(subprocess.getoutput("pwd")), #Prints the current working directory
 }
 
 
