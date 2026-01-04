@@ -42,7 +42,6 @@ def complete_commands(text):
     commands.update(PATH_COMMANDS)
     return sorted(cmd for cmd in commands if cmd.startswith(text))
 
-
 def complete_paths(text):
     if not text:
         text = "."
@@ -80,34 +79,49 @@ REDIRECTION_OPERATORS = {
     "2>>" : {"stream" : "stderr", "mode" : "a"},
 }
 
+def append_space_if_needed(buffer, completion):
+    if completion.endswith("/"):
+        return completion            # directories → no space
+    if buffer.endswith(" "):
+        return completion            # already spaced
+    return completion + " "
 
-def completer(text, state) :
+
+def completer(text, state):
     buffer = readline.get_line_buffer()
-    
-    try :
-        tokens = shlex.split(buffer, posix=True)
-    except ValueError :
-        return None
-    
-    if buffer.endswith(" ")  or not tokens :
+
+    try:
+        tokens = shlex.split(buffer)
+    except ValueError:
+        tokens = buffer.split()
+
+    if buffer.endswith(" ") or not tokens:
         curr_token = ""
         prev_token = tokens[-1] if tokens else ""
-    else :
+    else:
         curr_token = tokens[-1]
         prev_token = tokens[-2] if len(tokens) > 1 else ""
 
-
-    if len(tokens) <= 1 :
+    if len(tokens) <= 1:
         options = COMPLETERS["commands"](curr_token)
-    elif prev_token in REDIRECTION_OPERATORS :
-        optioins = COMPLETERS["path"](curr_token)
-    else :
-        options = COMPLETERS["commands"](curr_token) + COMPLETERS["path"](curr_token)
+    elif prev_token in REDIRECTION_OPERATORS:
+        options = COMPLETERS["path"](curr_token)
+    else:
+        options = (
+            COMPLETERS["commands"](curr_token) +
+            COMPLETERS["path"](curr_token)
+        )
 
-    try :
-        return options[state]
-    except IndexError :
-        return None 
+    try:
+        completion = options[state]
+        if completion.endswith("/"):
+            return completion
+        if buffer.endswith(" "):
+            return completion
+        return completion + " "
+    except IndexError:
+        return None
+
     
 #parse redirection from tokens
 def parse_redirection(tokens):
@@ -152,6 +166,7 @@ def parse_redirection(tokens):
 
 readline.parse_and_bind("tab: complete")
 readline.set_completer(completer)
+readline.set_completer_delims(" \t\n;<>|&")
 
 # Main function to run the shell
 def main():
