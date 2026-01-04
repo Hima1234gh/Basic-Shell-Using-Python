@@ -167,9 +167,12 @@ def parse_redirection(tokens):
     return tokens,stdin, stdout, stderr    
 
 def display_matches_hook(substitution, matches, longest_match_length):
-    print()  # newline before matches
-    print("  ".join(matches))
+    sys.stdout.write("\n")
+    sys.stdout.write("  ".join(matches))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
     readline.redisplay()
+
 
 
 readline.parse_and_bind("tab: complete")
