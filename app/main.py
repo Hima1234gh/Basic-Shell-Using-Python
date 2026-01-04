@@ -32,7 +32,58 @@ BULITINS = {
 }
 
 
+REDIRECTION_OPERATORS = {
+    "<" : {"stream" : "stdin", "mode" : "r"},
+    ">" : {"stream" : "stdout", "mode" : "w"},
+    "1>" : {"stream" : "stdout", "mode" : "w"},
+    ">>" : {"stream" : "stdout", "mode" : "a"},
+    "1>>" : {"stream" : "stdout", "mode" : "a"},
+    "2>" : {"stream" : "stderr", "mode" : "w"},
+    "2>>" : {"stream" : "stderr", "mode" : "a"},
+}
+
+
+def parse_redirection(tokens):
+    stdin = stdout = stderr = None
+    i = 0
+
+    while i < len(tokens) :
+        tok = tokens[1] 
+
+        if tok in REDIRECTION_OPERATORS :
+            if i + 1 >= len(tokens) :
+                print("syntax error near unexpected token")
+                break
+            file_name = tokens[i+1]
+            stream = REDIRECTION_OPERATORS[tok]["stream"]
+            mode = REDIRECTION_OPERATORS[tok]["mode"]
+
+            try :
+                f = open(file_name, mode)
+            except FileNotFoundError :
+                print(f"{file_name}: No such file or directory")
+                break
+            except PermissionError :
+                print(f"{file_name}: Permission denied")
+                break               
+
+            if stream == "stdin" :
+                stdin = f 
+            elif stream == "stdout" :
+                stdout = f
+            elif stream == "stderr" :
+                stderr = f
+
+            del tokens[i:i+2]
+            continue
+
+        i += 1
+    return tokens,stdin, stdout, stderr    
+
+
 # Main function to run the shell
+
+
 def main():
     while True:
         try:
@@ -41,9 +92,7 @@ def main():
 
             user_input = input()
 
-            stdin = None
-            stdout = None
-            stderr = None
+            
 
             try:
                 tokens = shlex.split(user_input, posix=True)
@@ -55,71 +104,14 @@ def main():
                 continue
 
             
-            if "<" in tokens:
-                idx = tokens.index("<")
-
-                if idx == len(tokens) - 1:
-                    print("syntax error: expected filename after '<'")
-                    continue
-
-                infile = tokens[idx + 1]
-
-                try:
-                    stdin = open(infile, "r")
-                except FileNotFoundError:
-                    print(f"{infile}: No such file or directory")
-                    continue
-                except PermissionError:
-                    print(f"{infile}: Permission denied")
-                    continue
-
-                del tokens[idx:idx + 2]
-
-            
-            i = 0
-            while i < len(tokens):
-                tok = tokens[i]
-
-                if tok in (">", "1>"):
-                    if i + 1 >= len(tokens):
-                        print("syntax error near '>'")
-                        break
-                    outfile = tokens[i + 1]
-                    stdout = open(outfile, "w")
-                    del tokens[i:i+2]
-                    continue
-
-                if tok in (">>", "1>>"):
-                    if i + 1 >= len(tokens):
-                        print("syntax error near '>>'")
-                        break
-                    outfile = tokens[i + 1]
-                    stdout = open(outfile, "a")
-                    del tokens[i:i+2]
-                    continue
-
-                if tok == "2>":
-                    if i + 1 >= len(tokens):
-                        print("syntax error near '2>'")
-                        break
-                    errfile = tokens[i + 1]
-                    stderr = open(errfile, "w")
-                    del tokens[i:i+2]
-                    continue
-
-                if tok == "2>>" :
-                    if i + 1 >= len(tokens):
-                        print("syntax error near '2>>'")
-                        break
-                    errfile = tokens[i + 1]
-                    stderr = open(errfile, "a")
-                    del tokens[i:i+2]
-                    continue
-
-                i += 1
-
-            
             expanded = [expand_vars(arg) for arg in tokens]
+
+            parsed = parse_redirection(expanded)
+
+            if parsed[0] is None:
+                continue
+
+            tokens, stdin, stdout, stderr = parsed
 
             cmd, *args = expanded
 
