@@ -89,7 +89,7 @@ def main():
                     del tokens[i:i+2]
                     continue
 
-                if tok == ">>":
+                if tok == ">>" or tok == "1>>":
                     if i + 1 >= len(tokens):
                         print("syntax error near '>>'")
                         break
