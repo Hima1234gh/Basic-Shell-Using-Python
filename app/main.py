@@ -118,7 +118,9 @@ def completer(text, state):
             return completion
         if buffer.endswith(" "):
             return completion
-        return completion + " "
+        if len(options) > 1 :
+            return  completion
+        return completion + " " 
     except IndexError:
         return None
 
@@ -164,10 +166,16 @@ def parse_redirection(tokens):
         i += 1
     return tokens,stdin, stdout, stderr    
 
+def display_matches_hook(substitution, matches, longest_match_length):
+    print()  # newline before matches
+    print("  ".join(matches))
+    readline.redisplay()
+
+
 readline.parse_and_bind("tab: complete")
 readline.set_completer(completer)
 readline.set_completer_delims(" \t\n;<>|&")
-
+readline.set_completion_display_matches_hook(display_matches_hook)
 # Main function to run the shell
 def main():
     while True:
