@@ -89,7 +89,7 @@ def main():
                     del tokens[i:i+2]
                     continue
 
-                if tok == ">>" or tok == "1>>":
+                if tok in (">>", "1>>"):
                     if i + 1 >= len(tokens):
                         print("syntax error near '>>'")
                         break
@@ -104,6 +104,15 @@ def main():
                         break
                     errfile = tokens[i + 1]
                     stderr = open(errfile, "w")
+                    del tokens[i:i+2]
+                    continue
+
+                if tok == "2>>" :
+                    if i + 1 >= len(tokens):
+                        print("syntax error near '2>>'")
+                        break
+                    errfile = tokens[i + 1]
+                    stderr = open(errfile, "a")
                     del tokens[i:i+2]
                     continue
 
