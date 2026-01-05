@@ -304,9 +304,7 @@ def main():
         while True:
             
             try:
-                print("$ ", end='', flush=True)
-
-                user_input = input()
+                user_input = input("$ ")
 
                 if user_input.strip() :
                     readline.add_history(user_input)
