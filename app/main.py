@@ -226,8 +226,11 @@ def execute_pipline_command(command):
             os.close(stdout)      
         prev_read = read_fd
 
-        for p in process :
-            p.wait()
+    if prev_read is not None:
+        os.close(prev_read)
+
+    for p in process :
+        p.wait()
 
 #main loop
 def main():
