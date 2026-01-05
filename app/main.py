@@ -9,6 +9,8 @@ import glob
 
 #utilities 
 
+HISTOTY_FILE = os.path.expanduser("~/.pyshell_history")
+
 def get_path_commands():
     cmds = set()
     for path in os.environ.get("PATH", "").split(os.pathsep):
@@ -270,14 +272,27 @@ def execute_pipeline(commands):
             p.wait()
 
 
+def load_history():    
+    try:
+        readline.read_history_file(HISTOTY_FILE)
+    except FileNotFoundError:
+        pass
+
+def save_history():
+    readline.write_history_file(HISTOTY_FILE)
+
 #main loop
 def main():
     while True:
+        load_history()
         try:
             sys.stdout.write("$ ")
             sys.stdout.flush()
 
             user_input = input()
+
+            if user_input.strip() :
+                readline.add_history(user_input)
             if not user_input:
                 continue
 
@@ -291,6 +306,8 @@ def main():
         except EOFError:
             print()
             break
+        finally :
+            save_history()
 
 if __name__ == "__main__":
     main()
