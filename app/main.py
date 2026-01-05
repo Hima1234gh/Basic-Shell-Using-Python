@@ -196,40 +196,39 @@ def execute_single_command(command):
             f.close()
 
 def execute_pipline_command(command):
-    num_cmds = len(command)
-    pipes = [os.pipe() for _ in range(num_cmds - 1)]
     process = []
+    prev_read = None
 
-    for i, cmd in enumerate(command):
-        expanded = [expand_vars(arg) for arg in cmd]
-        parsed = parse_redirection(expanded)
+    for i, cmd in enumerate(command) :
+        cmd = [expand_vars(arg) for arg in cmd]
 
-        if parsed[0] is None:
+        if i < len(command - 1):
+            read_fd, write_fd = os.pipe()
+            stdout = write_fd
+        else :
+            read_fd = write_fd = None
+            stdout = None
+
+        stdin = prev_read
+
+        try :
+            p = subprocess.Popen(cmd, stdin=stdin, stdout=stdout)
+            process.append(p)
+        except FileNotFoundError:
+            print(f"{cmd[0]}: command not found")
+            for pr in process:
+                pr.terminate()
             return
+        
+        if stdin is not None:
+            os.close(stdin)
+        if stdout is not None:
+            os.close(stdout)      
+        prev_read = read_fd
 
-        tokens, stdin, stdout, stderr = parsed
-        cmd, *args = tokens
-
-        if cmd in BUILTINS:
-            saved = sys.stdin, sys.stdout, sys.stderr
-            if stdin: sys.stdin = stdin
-            if stdout: sys.stdout = stdout
-            if stderr: sys.stderr = stderr
-
-            try:
-                BUILTINS[cmd]["func"](*args)
-            finally:
-                sys.stdin, sys.stdout, sys.stderr = saved
-        else:
-            try:
-                subprocess.run([cmd] + args, stdin=stdin, stdout=stdout, stderr=stderr)
-            except FileNotFoundError:
-                print(f"{cmd}: command not found")
-
-    for f in (stdin, stdout, stderr):
-        if f:
-            f.close()
-
+        for p in process :
+            p.wait()
+            
 #main loop
 def main():
     while True:
