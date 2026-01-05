@@ -8,7 +8,7 @@ import readline
 import glob
 
 #utilities 
-
+readline.set_auto_history(False)
 HISTOTY_FILE = os.path.expanduser("~/.pyshell_history")
 
 def get_path_commands():
