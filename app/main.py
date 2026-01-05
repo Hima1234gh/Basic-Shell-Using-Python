@@ -115,13 +115,6 @@ def completer(text, state):
     try:
         completion = options[state]
         return append_space_if_needed(buffer, completion)
-        # if completion.endswith("/"):
-        #     return completion
-        # if buffer.endswith(" "):
-        #     return completion
-        # if len(options) > 1 :
-        #     return  completion
-        # return completion + " " 
     except IndexError:
         return None
 
@@ -168,12 +161,16 @@ def parse_redirection(tokens):
     return tokens,stdin, stdout, stderr    
 
 def display_matches_hook(substitution, matches, longest_match_length):
-    sys.stdout.write("\n")
+    buffer = readline.get_line_buffer()
+    
+    sys.stdout.write('\n')
     clean_matches = [m.strip() for m in matches]
     sys.stdout.write("  ".join(clean_matches))
     sys.stdout.write("\n")
+
+    # Reprint prompt + buffer exactly
+    sys.stdout.write("$ " + buffer)
     sys.stdout.flush()
-    readline.redisplay()
 
 
 
