@@ -51,6 +51,14 @@ BUILTINS = {
            os.chdir(os.path.expanduser(path))
            if os.path.exists(os.path.expanduser(path))
            else print(f"cd: {path}: No such file or directory")},
+    "history": {
+        "func": lambda *args: [
+            [print(f"{i+1}  {readline.get_history_item(i+1)}")
+             for i in range(readline.get_current_history_length())]
+             if not args 
+             else readline.clear_history()
+        ]
+    },     
 }
 
 #Redirection parsing
