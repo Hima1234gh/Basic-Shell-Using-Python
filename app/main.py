@@ -58,7 +58,8 @@ BUILTINS = {
              if not args 
              else readline.clear_history()
         ]
-    },     
+    },
+     
 }
 
 #Redirection parsing
@@ -291,31 +292,37 @@ def save_history():
 
 #main loop
 def main():
-    while True:
-        load_history()
-        try:
-            sys.stdout.write("$ ")
-            sys.stdout.flush()
+    load_history()
+    try :
+        while True:
+            
+            try:
+                sys.stdout.write("$ ")
+                sys.stdout.flush()
 
-            user_input = input()
+                user_input = input()
 
-            if user_input.strip() :
-                readline.add_history(user_input)
-            if not user_input:
-                continue
+                if user_input.strip() :
+                    readline.add_history(user_input)
+                if not user_input:
+                    continue
 
-            commands = parse_input(user_input)
+                commands = parse_input(user_input)
 
-            if len(commands) == 1:
-                execute_single_command(commands[0])
-            else:
-                execute_pipeline(commands)
+                if len(commands) == 1:
+                    execute_single_command(commands[0])
+                else:
+                    execute_pipeline(commands)
 
-        except EOFError:
-            print()
-            break
-        finally :
-            save_history()
+            except EOFError:
+                print()
+                break
+    except EOFError :
+        print()
+    except KeyboardInterrupt :
+        print()
+    finally:
+        save_history()
 
 if __name__ == "__main__":
     main()
