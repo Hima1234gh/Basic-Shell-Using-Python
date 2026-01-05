@@ -195,42 +195,80 @@ def execute_single_command(command):
         if f:
             f.close()
 
-def execute_pipline_command(command):
-    process = []
-    prev_read = None
+def execute_pipeline(commands):
+    processes = []
+    prev_read = None  # read end of previous pipe
 
-    for i, cmd in enumerate(command) :
+    for i, cmd in enumerate(commands):
         cmd = [expand_vars(arg) for arg in cmd]
+        is_builtin = cmd[0] in BUILTINS
 
-        if i < len(command) - 1:
+        # create pipe unless last command
+        if i < len(commands) - 1:
             read_fd, write_fd = os.pipe()
-            stdout = write_fd
-        else :
+            stdout_fd = write_fd
+        else:
             read_fd = write_fd = None
-            stdout = None
+            stdout_fd = None
 
-        stdin = prev_read
+        stdin_fd = prev_read
 
-        try :
-            p = subprocess.Popen(cmd, stdin=stdin, stdout=stdout)
-            process.append(p)
-        except FileNotFoundError:
-            print(f"{cmd[0]}: command not found")
-            for pr in process:
-                pr.terminate()
-            return
-        
-        if stdin is not None:
-            os.close(stdin)
-        if stdout is not None:
-            os.close(stdout)      
+        if is_builtin:
+            pid = os.fork()
+
+            if pid == 0:
+                # CHILD
+                if stdin_fd is not None:
+                    os.dup2(stdin_fd, 0)
+                if stdout_fd is not None:
+                    os.dup2(stdout_fd, 1)
+
+                # close all pipe fds in child
+                if stdin_fd is not None:
+                    os.close(stdin_fd)
+                if stdout_fd is not None:
+                    os.close(stdout_fd)
+                if read_fd is not None:
+                    os.close(read_fd)
+
+                BUILTINS[cmd[0]]["func"](*cmd[1:])
+                os._exit(0)
+
+            else:
+                # PARENT
+                processes.append(pid)
+
+        else:
+            try:
+                p = subprocess.Popen(
+                    cmd,
+                    stdin=stdin_fd,
+                    stdout=stdout_fd
+                )
+                processes.append(p)
+            except FileNotFoundError:
+                print(f"{cmd[0]}: command not found")
+                return
+
+        # parent closes used fds
+        if stdin_fd is not None:
+            os.close(stdin_fd)
+        if stdout_fd is not None:
+            os.close(stdout_fd)
+
         prev_read = read_fd
 
+    # 🔥 critical: close final read end
     if prev_read is not None:
         os.close(prev_read)
 
-    for p in process :
-        p.wait()
+    # wait for all children
+    for p in processes:
+        if isinstance(p, int):
+            os.waitpid(p, 0)
+        else:
+            p.wait()
+
 
 #main loop
 def main():
@@ -248,7 +286,7 @@ def main():
             if len(commands) == 1:
                 execute_single_command(commands[0])
             else:
-                execute_pipline_command(commands)   
+                execute_pipeline(commands)
 
         except EOFError:
             print()
