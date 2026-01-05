@@ -195,6 +195,41 @@ def execute_single_command(command):
         if f:
             f.close()
 
+def execute_pipline_command(command):
+    num_cmds = len(command)
+    pipes = [os.pipe() for _ in range(num_cmds - 1)]
+    process = []
+
+    for i, cmd in enumerate(command):
+        expanded = [expand_vars(arg) for arg in cmd]
+        parsed = parse_redirection(expanded)
+
+        if parsed[0] is None:
+            return
+
+        tokens, stdin, stdout, stderr = parsed
+        cmd, *args = tokens
+
+        if cmd in BUILTINS:
+            saved = sys.stdin, sys.stdout, sys.stderr
+            if stdin: sys.stdin = stdin
+            if stdout: sys.stdout = stdout
+            if stderr: sys.stderr = stderr
+
+            try:
+                BUILTINS[cmd]["func"](*args)
+            finally:
+                sys.stdin, sys.stdout, sys.stderr = saved
+        else:
+            try:
+                subprocess.run([cmd] + args, stdin=stdin, stdout=stdout, stderr=stderr)
+            except FileNotFoundError:
+                print(f"{cmd}: command not found")
+
+    for f in (stdin, stdout, stderr):
+        if f:
+            f.close()
+
 #main loop
 def main():
     while True:
@@ -211,7 +246,7 @@ def main():
             if len(commands) == 1:
                 execute_single_command(commands[0])
             else:
-                print("Pipeline execution coming next 🚧")
+                execute_pipline_command(commands)   
 
         except EOFError:
             print()
