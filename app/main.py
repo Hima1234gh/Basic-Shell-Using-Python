@@ -202,7 +202,7 @@ def execute_pipline_command(command):
     for i, cmd in enumerate(command) :
         cmd = [expand_vars(arg) for arg in cmd]
 
-        if i < len(command - 1):
+        if i < len(command) - 1:
             read_fd, write_fd = os.pipe()
             stdout = write_fd
         else :
@@ -228,7 +228,7 @@ def execute_pipline_command(command):
 
         for p in process :
             p.wait()
-            
+
 #main loop
 def main():
     while True:
