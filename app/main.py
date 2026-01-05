@@ -304,8 +304,7 @@ def main():
         while True:
             
             try:
-                sys.stdout.write("$ ")
-                sys.stdout.flush()
+                print("$ ", end='', flush=True)
 
                 user_input = input()
 
