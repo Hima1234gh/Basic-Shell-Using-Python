@@ -114,13 +114,14 @@ def completer(text, state):
 
     try:
         completion = options[state]
-        if completion.endswith("/"):
-            return completion
-        if buffer.endswith(" "):
-            return completion
-        if len(options) > 1 :
-            return  completion
-        return completion + " " 
+        return append_space_if_needed(buffer, completion)
+        # if completion.endswith("/"):
+        #     return completion
+        # if buffer.endswith(" "):
+        #     return completion
+        # if len(options) > 1 :
+        #     return  completion
+        # return completion + " " 
     except IndexError:
         return None
 
@@ -179,6 +180,8 @@ readline.parse_and_bind("tab: complete")
 readline.set_completer(completer)
 readline.set_completer_delims(" \t\n;<>|&")
 readline.set_completion_display_matches_hook(display_matches_hook)
+
+
 # Main function to run the shell
 def main():
     while True:
