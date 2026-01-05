@@ -169,7 +169,7 @@ def parse_redirection(tokens):
 
 def display_matches_hook(substitution, matches, longest_match_length):
     sys.stdout.write("\n")
-    clean_matches = [m.replace("\n", "\\n") for m in matches]
+    clean_matches = [m.strip() for m in matches]
     sys.stdout.write("  ".join(clean_matches))
     sys.stdout.write("\n")
     sys.stdout.flush()
