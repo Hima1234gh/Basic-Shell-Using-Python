@@ -39,8 +39,26 @@ def expand_vars(arg: str) -> str:
 
     return re.sub(pattern, replace, arg)
 
-#Buitlin commands
+def _history_impl(*args):
+    length = readline.get_current_history_length()
 
+    if args and args[0] == "-c":
+        readline.clear_history()
+        open(HISTOTY_FILE, 'w').close()
+        return
+    
+    if args and args[0].isdigit():
+        n = int(args[0])
+        start = max(1, length - n + 1)
+    else:
+        start = 1
+
+    for i in range(start, length + 1):
+        item = readline.get_history_item(i)
+        if item:
+            print(f"{i:5d}  {item}")
+
+#Buitlin commands
 BUILTINS = {
     "exit": {"func": lambda code=0, *_: sys.exit(int(code))},
     "echo": {"func": lambda *args: print(" ".join(args))},
@@ -51,15 +69,7 @@ BUILTINS = {
            os.chdir(os.path.expanduser(path))
            if os.path.exists(os.path.expanduser(path))
            else print(f"cd: {path}: No such file or directory")},
-    "history": {
-        "func": lambda *args: [
-            [print(f"{i+1}  {readline.get_history_item(i+1)}")
-             for i in range(readline.get_current_history_length())]
-             if not args 
-             else readline.clear_history()
-        ]
-    },
-     
+    "history": {"func": lambda *args: _history_impl(*args),}
 }
 
 #Redirection parsing
@@ -282,10 +292,7 @@ def execute_pipeline(commands):
 
 
 def load_history():    
-    try:
-        readline.read_history_file(HISTOTY_FILE)
-    except FileNotFoundError:
-        pass
+    readline.clear_history()
 
 def save_history():
     readline.write_history_file(HISTOTY_FILE)
