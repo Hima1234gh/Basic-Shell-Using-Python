@@ -47,6 +47,17 @@ def _history_impl(*args):
         open(HISTOTY_FILE, 'w').close()
         return
     
+    if args and args[0] == "-r" :
+        try :
+            readline.read_history_file(HISTOTY_FILE)
+        except FileNotFoundError :
+            pass
+        return   
+    
+    if args and args[0] == "-w" :
+        readline.write_history_file(HISTOTY_FILE)
+        return
+
     if args and args[0].isdigit():
         n = int(args[0])
         start = max(1, length - n + 1)
