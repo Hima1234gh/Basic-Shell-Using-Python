@@ -318,7 +318,7 @@ def main():
             try:
                 user_input = input("$ ")
 
-                if user_input.strip() and user_input.startswith("history -r"):
+                if user_input.strip() : #and user_input.startswith("history -r"):
                     readline.add_history(user_input)
                 if not user_input:
                     continue
