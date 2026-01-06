@@ -56,7 +56,11 @@ def _history_impl(*args):
         return   
     
     if args and args[0] == "-w" :
-        readline.write_history_file(HISTOTY_FILE)
+        filname = args[1] if len(args) > 1 else HISTOTY_FILE
+        try :
+            readline.write_history_file(filname) 
+        except FileNotFoundError :
+            pass
         return
 
     if args and args[0].isdigit():
