@@ -48,8 +48,9 @@ def _history_impl(*args):
         return
     
     if args and args[0] == "-r" :
+        filname = args[1] if len(args) > 1 else HISTOTY_FILE
         try :
-            readline.read_history_file(HISTOTY_FILE)
+            readline.read_history_file(filname) 
         except FileNotFoundError :
             pass
         return   
@@ -290,7 +291,7 @@ def execute_pipeline(commands):
 
         prev_read = read_fd
 
-    # 🔥 critical: close final read end
+    # close final read end
     if prev_read is not None:
         os.close(prev_read)
 
@@ -317,7 +318,7 @@ def main():
             try:
                 user_input = input("$ ")
 
-                if user_input.strip() :
+                if user_input.strip() and user_input.startswith("history -r"):
                     readline.add_history(user_input)
                 if not user_input:
                     continue
