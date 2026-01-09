@@ -56,22 +56,26 @@ def _history_impl(*args):
         return   
     
     if args and args[0] == "-w" :
-        filname = args[1] if len(args) > 1 else HISTOTY_FILE
+        filename = args[1] if len(args) > 1 else HISTOTY_FILE
         try :
-            readline.write_history_file(readline.get_current_history_length(), filname) 
+            readline.write_history_file(filname) 
         except FileNotFoundError :
-            open(filname, "a").close()
-            readline.append_history_file(readline.get_current_history_length(),  filname)
+            pass
         return
     
     if args and args[0] == "-a" and len(args) > 1:
-        filenam = args[1] if len(args) > 1 else HISTOTY_FILE
+        
+        ilename = args[1] if len(args) > 1 else HISTOTY_FILE   
+
         try :
-            readline.append_history_file(filenam) 
+            readline.append_history_file(
+                readline.get_current_history_length(), filename)
         except FileNotFoundError :
-            pass
-        return  
-    
+            open(filename, 'a').close()
+            readline.append_history_file(
+                readline.get_current_history_length(), filename)
+        return
+
     if args and args[0].isdigit():
         n = int(args[0])
         start = max(1, length - n + 1)
