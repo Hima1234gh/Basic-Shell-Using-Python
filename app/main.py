@@ -62,7 +62,15 @@ def _history_impl(*args):
         except FileNotFoundError :
             pass
         return
-
+    
+    if args and args[0] == "-a" and len(args) > 1:
+        filenam = args[1] if len(args) > 1 else HISTOTY_FILE
+        try :
+            readline.append_history_file(1, filenam) 
+        except FileNotFoundError :
+            pass
+        return  
+    
     if args and args[0].isdigit():
         n = int(args[0])
         start = max(1, length - n + 1)
@@ -322,7 +330,7 @@ def main():
             try:
                 user_input = input("$ ")
 
-                if user_input.strip() : #and user_input.startswith("history -r"):
+                if user_input.strip() : 
                     readline.add_history(user_input)
                 if not user_input:
                     continue
