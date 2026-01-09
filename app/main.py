@@ -66,7 +66,7 @@ def _history_impl(*args):
     if args and args[0] == "-a" and len(args) > 1:
         filenam = args[1] if len(args) > 1 else HISTOTY_FILE
         try :
-            readline.append_history_file(1, filenam) 
+            readline.append_history_file(filenam) 
         except FileNotFoundError :
             pass
         return  
