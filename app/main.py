@@ -58,9 +58,10 @@ def _history_impl(*args):
     if args and args[0] == "-w" :
         filname = args[1] if len(args) > 1 else HISTOTY_FILE
         try :
-            readline.write_history_file(filname) 
+            readline.write_history_file(readline.get_current_history_length(), filname) 
         except FileNotFoundError :
-            pass
+            open(filname, "a").close()
+            readline.append_history_file(readline.get_current_history_length(),  filname)
         return
     
     if args and args[0] == "-a" and len(args) > 1:
