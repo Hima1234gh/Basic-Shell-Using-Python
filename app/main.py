@@ -9,7 +9,7 @@ import glob
 
 #utilities 
 readline.set_auto_history(False)
-HISTOTY_FILE = os.path.expanduser("~/.pyshell_history")
+HISTORY_FILE = os.path.expanduser("~/.pyshell_history")
 
 def get_path_commands():
     cmds = set()
@@ -44,28 +44,28 @@ def _history_impl(*args):
 
     if args and args[0] == "-c":
         readline.clear_history()
-        open(HISTOTY_FILE, 'w').close()
+        open(HISTORY_FILE, 'w').close()
         return
     
     if args and args[0] == "-r" :
-        filname = args[1] if len(args) > 1 else HISTOTY_FILE
+        filename = args[1] if len(args) > 1 else HISTORY_FILE
         try :
-            readline.read_history_file(filname) 
+            readline.read_history_file(filename) 
         except FileNotFoundError :
             pass
         return   
     
     if args and args[0] == "-w" :
-        filename = args[1] if len(args) > 1 else HISTOTY_FILE
+        filename = args[1] if len(args) > 1 else HISTORY_FILE
         try :
-            readline.write_history_file(filname) 
+            readline.write_history_file(filename) 
         except FileNotFoundError :
             pass
         return
     
     if args and args[0] == "-a" and len(args) > 1:
         
-        filename = args[1] if len(args) > 1 else HISTOTY_FILE   
+        filename = args[1] if len(args) > 1 else HISTORY_FILE   
 
         try :
             readline.append_history_file(
@@ -324,7 +324,7 @@ def load_history():
     readline.clear_history()
 
 def save_history():
-    readline.write_history_file(HISTOTY_FILE)
+    readline.write_history_file(HISTORY_FILE)
 
 #main loop
 def main():
