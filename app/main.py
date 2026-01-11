@@ -336,8 +336,9 @@ def load_history():
     global HISTORY_APPEND
 
     try :
-        readline.read_history_file(histfile)
-    except FileNotFoundError :
+        if os.path.exists(histfile):
+            readline.read_history_file(histfile)
+    except (FileNotFoundError, OSError) :
         pass
     HISTORY_APPEND = readline.get_current_history_length()
 
