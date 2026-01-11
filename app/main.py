@@ -55,7 +55,7 @@ def history_impl(*args):
         return
     
     if args and args[0] == "-r" :
-        filename = args[1] if len(args) > 1 else hist_file_path()()
+        filename = args[1] if len(args) > 1 else hist_file_path()
         try :
             readline.read_history_file(filename) 
         except FileNotFoundError :
@@ -64,34 +64,27 @@ def history_impl(*args):
     
     if args and args[0] == "-w" :
         filename = args[1] if len(args) > 1 else hist_file_path()
-        try :
-            readline.write_history_file(filename) 
-        except FileNotFoundError :
-            pass
+        readline.write_history_file(filename)
+        
+        global HISTORY_APPEND
+        HISTORY_APPEND = readline.get_current_history_length()
         return
     
-    if args and args[0] == "-a" and len(args) > 1:
-        
-        filename = args[1] if len(args) > 1 else hist_file_path()   
+    if args and args[0] == "-a" :
+        filename = args[1] if len(args) > 1 else hist_file_path()
 
-        try :
-            global HISTORY_APPEND
-            total = readline.get_current_history_length()
-            to_append = total - HISTORY_APPEND
+        global HISTORY_APPEND
+        total = readline.get_cuurrent_history_length()
+        to_appned = total - HISTORY_APPEND
 
-            if to_append > 0 :
-                try :
-                    readline.append_history_file(to_append, filename)
-                    HISTORY_APPEND = total
-
-                except FileNotFoundError :
-                    open(filename, 'a').close()
-                    readline.append_history_file(
-                        readline.get_current_history_length(), filename)
-        except FileNotFoundError as e: 
-            print(e)
+        if to_appned > 0 :
+            try :
+                readline.append_history_file(to_appned, filename)
+            except FileNotFoundError :
+                open(filename, "a").close()
+                readline.append_history_file(to_appned, filename)
+            HISTORY_APPEND = total
         return
-
     if args and args[0].isdigit():
         n = int(args[0])
         start = max(1, length - n + 1)
@@ -339,10 +332,14 @@ def execute_pipeline(commands):
 def load_history():    
     readline.clear_history()
     histfile = hist_file_path()
+    global HISTORY_APPEND
+
     try :
         readline.read_history_file(histfile)
     except FileNotFoundError :
         pass
+    HISTORY_APPEND = readline.get_current_history_length()
+
 
 def save_history():
     readline.write_history_file(hist_file_path())
