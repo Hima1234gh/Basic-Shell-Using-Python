@@ -9,7 +9,7 @@ import glob
 
 #utilities 
 readline.set_auto_history(False)
-HISTORY_FILE = os.path.expanduser("~/.pyshell_history")
+# HISTORY_FILE = os.path.expanduser("~/.pyshell_history")
 HISTORY_APPEND = 0
 
 def get_path_commands():
@@ -40,16 +40,22 @@ def expand_vars(arg: str) -> str:
 
     return re.sub(pattern, replace, arg)
 
-def _history_impl(*args):
+def hist_file_path():
+    return os.path.expanduser(
+        os.environ.get("HISTFILE", "~/.pyshell_history")
+    )
+
+#history command implementation
+def history_impl(*args):
     length = readline.get_current_history_length()
 
     if args and args[0] == "-c":
         readline.clear_history()
-        open(HISTORY_FILE, 'w').close()
+        open(hist_file_path(), 'w').close()
         return
     
     if args and args[0] == "-r" :
-        filename = args[1] if len(args) > 1 else HISTORY_FILE
+        filename = args[1] if len(args) > 1 else hist_file_path()()
         try :
             readline.read_history_file(filename) 
         except FileNotFoundError :
@@ -57,7 +63,7 @@ def _history_impl(*args):
         return   
     
     if args and args[0] == "-w" :
-        filename = args[1] if len(args) > 1 else HISTORY_FILE
+        filename = args[1] if len(args) > 1 else hist_file_path()
         try :
             readline.write_history_file(filename) 
         except FileNotFoundError :
@@ -66,7 +72,7 @@ def _history_impl(*args):
     
     if args and args[0] == "-a" and len(args) > 1:
         
-        filename = args[1] if len(args) > 1 else HISTORY_FILE   
+        filename = args[1] if len(args) > 1 else hist_file_path()   
 
         try :
             global HISTORY_APPEND
@@ -74,13 +80,16 @@ def _history_impl(*args):
             to_append = total - HISTORY_APPEND
 
             if to_append > 0 :
-                readline.append_history_file(to_append, filename)
-                HISTORY_APPEND = total
-                
-        except FileNotFoundError :
-            open(filename, 'a').close()
-            readline.append_history_file(
-                readline.get_current_history_length(), filename)
+                try :
+                    readline.append_history_file(to_append, filename)
+                    HISTORY_APPEND = total
+
+                except FileNotFoundError :
+                    open(filename, 'a').close()
+                    readline.append_history_file(
+                        readline.get_current_history_length(), filename)
+        except FileNotFoundError as e: 
+            print(e)
         return
 
     if args and args[0].isdigit():
@@ -105,7 +114,7 @@ BUILTINS = {
            os.chdir(os.path.expanduser(path))
            if os.path.exists(os.path.expanduser(path))
            else print(f"cd: {path}: No such file or directory")},
-    "history": {"func": lambda *args: _history_impl(*args),}
+    "history": {"func": lambda *args: history_impl(*args),}
 }
 
 #Redirection parsing
@@ -329,9 +338,14 @@ def execute_pipeline(commands):
 
 def load_history():    
     readline.clear_history()
+    histfile = hist_file_path()
+    try :
+        readline.read_history_file(histfile)
+    except FileNotFoundError :
+        pass
 
 def save_history():
-    readline.write_history_file(HISTORY_FILE)
+    readline.write_history_file(hist_file_path())
 
 #main loop
 def main():
