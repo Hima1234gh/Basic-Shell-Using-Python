@@ -10,6 +10,7 @@ import glob
 #utilities 
 readline.set_auto_history(False)
 HISTORY_FILE = os.path.expanduser("~/.pyshell_history")
+HISTORY_APPEND = 0
 
 def get_path_commands():
     cmds = set()
@@ -68,8 +69,14 @@ def _history_impl(*args):
         filename = args[1] if len(args) > 1 else HISTORY_FILE   
 
         try :
-            readline.append_history_file(
-                readline.get_current_history_length(), filename)
+            global HISTORY_APPEND
+            total = readline.get_current_history_length()
+            to_append = total - HISTORY_APPEND
+
+            if to_append > 0 :
+                readline.append_history_file(to_append, filename)
+                HISTORY_APPEND = total
+                
         except FileNotFoundError :
             open(filename, 'a').close()
             readline.append_history_file(
