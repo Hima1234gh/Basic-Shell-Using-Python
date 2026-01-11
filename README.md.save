@@ -12,6 +12,7 @@ A Unix-like shell implemented in Python, supporting:
 - Persistent history across sessions
 - Linux-only implementation
 
+
 ## How to Run
 ```bash
 python3 main.py
