@@ -47,44 +47,45 @@ def hist_file_path():
 
 #history command implementation
 def history_impl(*args):
+    global HISTORY_APPEND
     length = readline.get_current_history_length()
 
     if args and args[0] == "-c":
         readline.clear_history()
-        open(hist_file_path(), 'w').close()
+        open(hist_file_path(), "w").close()
+        HISTORY_APPEND = 0
         return
-    
-    if args and args[0] == "-r" :
+
+    if args and args[0] == "-r":
         filename = args[1] if len(args) > 1 else hist_file_path()
-        try :
-            readline.read_history_file(filename) 
-        except FileNotFoundError :
+        try:
+            readline.read_history_file(filename)
+        except FileNotFoundError:
             pass
-        return   
-    
-    if args and args[0] == "-w" :
+        return
+
+    if args and args[0] == "-w":
         filename = args[1] if len(args) > 1 else hist_file_path()
         readline.write_history_file(filename)
-        
-        global HISTORY_APPEND
         HISTORY_APPEND = readline.get_current_history_length()
         return
-    
-    if args and args[0] == "-a" :
+
+    if args and args[0] == "-a":
         filename = args[1] if len(args) > 1 else hist_file_path()
 
-        global HISTORY_APPEND
-        total = readline.get_cuurrent_history_length()
-        to_appned = total - HISTORY_APPEND
+        total = readline.get_current_history_length()
+        to_append = total - HISTORY_APPEND
 
-        if to_appned > 0 :
-            try :
-                readline.append_history_file(to_appned, filename)
-            except FileNotFoundError :
+        if to_append > 0:
+            try:
+                readline.append_history_file(to_append, filename)
+            except FileNotFoundError:
                 open(filename, "a").close()
-                readline.append_history_file(to_appned, filename)
+                readline.append_history_file(to_append, filename)
+
             HISTORY_APPEND = total
         return
+
     if args and args[0].isdigit():
         n = int(args[0])
         start = max(1, length - n + 1)
